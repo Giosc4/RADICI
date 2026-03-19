@@ -1,0 +1,205 @@
+:root {
+    --marker-orange: #ff8c1a;
+}
+/* ----------------------
+   HEADER
+----------------------- */
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* 🔥 THIS is the key */
+
+    padding: 12px 20px;
+
+    background: rgba(255, 255, 255, 0.644);
+    backdrop-filter: blur(12px);
+
+    z-index: 1200;
+    /*box-shadow: 0 2px 10px rgba(0,0,0,0.08);*/
+}
+
+header h1 {
+    margin: 0;
+    font-size: 5rem;
+    font-family: 'Xanh Mono', monospace;
+    color: #222;
+}
+
+
+#burger-btn {
+    width: 40px;
+    height: 24px;
+    position: relative;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* lines */
+#burger-btn .line {
+    height: 5px;
+    width: 100%;
+    background: linear-gradient(
+        180deg,
+        #ff9f2d 0%,
+        #ff8c1a 50%,
+        #ff9f2d 100%
+    ); 
+    border-radius: 2px;
+
+    transition:
+        transform 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.25s ease;
+    transform-origin: center;
+}
+
+/* 🔥 ACTIVE → CROSS */
+#burger-btn.active .top {
+    transform: translateY(9px) rotate(45deg);
+}
+
+#burger-btn.active .bottom {
+    transform: translateY(-9px) rotate(-45deg);
+}
+
+#burger-btn.active .middle {
+    opacity: 0;
+}
+
+
+/* ----------------------
+   TAB-STYLE SIDE MENU
+----------------------- */
+
+/* RIGHT SIDE MENU CONTAINER */
+#side-menu {
+    position: fixed;
+    top: 50%;           /* middle of viewport */
+    right: -340px;      /* hidden by default */
+    width: 320px;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 0 20px;
+    z-index: 1100;
+
+    transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* 🔥 center vertically */
+    transform: translateY(-50%);
+}
+
+
+#side-menu.open {
+    right: 0;
+}
+
+/* MENU TABS */
+.menu-item {
+    position: relative;
+
+    padding: 36px 24px 36px 48px;
+
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(15px);
+
+    border-radius: 16px 0 0 16px;
+
+    box-shadow: -4px 4px 14px rgba(0,0,0,0.12);
+
+    text-decoration: none;
+    color: #111;
+
+    transition:
+        background-color 0.25s ease,
+        color 0.25s ease;
+
+    /* 🔥 STACKING */
+    margin-top: -14px;
+}
+
+
+/* HOVER SLIDE */
+:root {
+    --marker-orange: #ff8c1a;
+}
+
+.menu-item:hover {
+    z-index: 10;
+}
+.menu-item:hover,
+.menu-item:focus-visible {
+    background: var(--marker-orange);
+    color: white;
+}
+
+/* TEXT */
+.menu-label {
+    font-family: 'Martian Mono', monospace;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: inherit;
+}
+.menu-item:nth-child(1) { z-index: 1; }
+.menu-item:nth-child(2) { z-index: 2; }
+.menu-item:nth-child(3) { z-index: 3; }
+.menu-item:nth-child(4) { z-index: 4; }
+
+.menu-item {
+    box-shadow:
+        -4px 4px 14px rgba(0,0,0,0.12),
+        inset 0 1px 0 rgba(255,255,255,0.4);
+}
+
+/* ----------------------
+   PAGE CONTENT
+----------------------- */
+#app-content {
+    padding-top: 120px; /* header height */
+}
+
+/* ----------------------
+   OPTIONAL: overlay when menu open
+----------------------- */
+#menu-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3); /* slightly dark overlay */
+    z-index: 1150;  /* below header but above content */
+}
+
+#menu-overlay.active {
+    display: block;
+}
+
+#site-title {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+}
+
+.username {
+    font-size: 1.4rem;
+    font-weight: 300;
+    opacity: 0.7;
+}
+
+.hidden {
+    display: none;
+}

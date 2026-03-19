@@ -1,0 +1,19 @@
+{
+  "CN": "VARLab Internal Root CA",
+  "key": {
+    "algo": "rsa",
+    "size": 4096
+  },
+  "names": [
+    {
+      "C": "IT",
+      "ST": "Emilia-Romagna",
+      "L": "Bologna",
+      "O": "VARLab-UNIBO",
+      "OU": "Security"
+    }
+  ],
+  "ca": {
+    "expiry": "87600h"
+  }
+}

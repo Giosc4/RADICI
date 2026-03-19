@@ -1,0 +1,18 @@
+# Additional dependencies used by the active data pipeline scripts.
+# These are installed separately from the runtime requirements so the
+# application stack can stay lighter when the pipeline is not needed.
+
+requests==2.32.3
+redis==5.2.1
+numpy==2.0.2
+pandas==2.2.3
+matplotlib==3.9.4
+opencv-python==4.11.0.86
+tensorflow==2.19.0
+torch==2.7.1
+torchvision==0.22.1
+beautifulsoup4==4.13.3
+pdf2image==1.17.0
+jsonlines==4.0.0
+opencage==3.1.0
+faiss-cpu==1.10.0

@@ -1,0 +1,22 @@
+# Ignora completamente queste cartelle alla radice del repo
+/RADICI/
+/downloaded_images/
+__pycache__/
+*.pyc
+dump.rdb
+*.rdb
+radici_git_backup_*/
+radici_modified_backup_*.tar
+
+# Ignora file di dati nel backend (anche nelle sottocartelle)
+/backend/**/*.csv
+/backend/**/*.pkl
+/backend/**/*.faiss
+.env
+.env.example
+.env.local
+
+# Ignora file nel frontend (anche nelle sottocartelle)
+/frontend/**/*.geojson
+/frontend/**/*.zip
+/backend/downloaded_images/

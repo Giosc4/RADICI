@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="section-header">
+    <!-- Left big number -->
+    <div class="section-number">[4]</div>
+
+    <!-- Right content -->
+    <div class="section-text">
+        <h2 class="section-title">About</h2>
+        <p class="section-subtitle">In questa sezione ti raccontiamo il progetto Artifex.</p>
+    </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<main class="content">
+
+    <!-- VIDEO -->
+    <div class="video-wrapper">
+        <iframe
+            src="https://www.youtube.com/embed/ONp7N4D8_lY"
+            allowfullscreen>
+        </iframe>
+    </div>
+
+    <!-- TEXT BLOCK -->
+    <section class="text-block">
+        <h2>Cos’è ARTIFEX?</h2>
+        <p>
+            ARTIFEX rappresenta un’infrastruttura di aggregazione e servizio per l’integrazione dinamica di archivi, collezioni e repository, 
+            relativi ai patrimoni culturali regionali, con l’obiettivo di aumentarne la fruizione digitale da parte del settore ICC.
+        </p>
+    </section>
+
+    <section class="text-block">
+        <h2>Qual è l’origine del progetto?</h2>
+        <p>
+            Il progetto nasce all’interno di RADICI – Realizzazione di una infrastruttura di Aggregazione e Digitalizzazione di patrimoni 
+            per favorire l’Interazione con il settore delle Industrie culturali e creative; iniziativa biennale finanziata dal PR FESR [101132704] 
+            e sostenuta dalla Regione Emilia-Romagna. Con un approccio orientato al design per i beni culturali, RADICI contribuisce allo sviluppo 
+            regionale attraverso la prototipazione di catene del valore transettoriali dedicate all’accesso, alla co-produzione, all’esperienza e 
+            allo sfruttamento del patrimonio culturale digitale.
+        </p>
+    </section>
+    <section class="text-block">
+        <h2>Obiettivi</h2>
+        <p>
+            RADICI, attraverso la piattaforma ARTIFEX, contribuisce al raggiungimento di alcuni obiettivi della Data Valley Bene Comune – Agenda Digitale dell’Emilia-Romagna 2022-2025, tra cui:
+            <ul>
+                <li>la promozione della trasformazione digitale dei sistemi economici regionali, delle imprese e delle filiere territoriali, accelerando la produzione, l’uso e la monetizzazione dei dati anche da parte delle PMI;</li>
+                <li>l’utilizzo dei dati come risorsa per l’economia digitale delle Industrie Culturali e Creative (ICC), migliorandone efficienza e produttività;</li>
+                <li>la condivisione di competenze digitali tra centri di ricerca e ICC.</li>
+            </ul>
+            Pur condividendo obiettivi con piattaforme come CrowdHeritage e InCulture, ARTIFEX si distingue per la capacità di unificare informazioni provenienti da diverse sorgenti grazie a sistemi di intelligenza artificiale (IA), 
+            creando al contempo un nuovo database utile per l’addestramento di modelli di IA destinati a migliorare la piattaforma stessa.
+        </p>
+    </section>
+    <section class="text-block">
+        <h2>Eco-sistema regionale</h2>
+        <p>
+            La collaborazione tra i centri della Rete Alta Tecnologia (CRICC - Centro di ricerca sulle Industrie Culturali e Creative, CIRI ICT - Centro Interdipartimentale di Ricerca Industriale, 
+            DHMoRe - Centro Interdipartimentale di Ricerca sulle Digital Humanities, CICCREI - Centro Interdipartimentale di Ricerca per la Costruzione, 
+            la Conservazione e la Rigenerazione di Edifici e Infrastrutture) e il Centro Studi e Archivio per la Comunicazione (CSAC) ha dato vita a processi di filiera modulabili per nuove esperienze di uso, valorizzazione e sfruttamento di patrimoni materiali e immateriali, con la finalità di favorire rapidità di accesso, maggiore comprensione, sviluppo di competenze e future skills legate al patrimonio culturale (CH).
+        </p>
+    </section>
+    <section class="text-block">
+        <h2>In conclusione</h2>
+        <p>
+            Gli strumenti e i servizi offerti dal prototipo ARTIFEX permettono alle ICC, agli enti pubblici e privati, nonché a ricercatori e operatori culturali, di utilizzare i giacimenti digitali integrati per creare nuovi prodotti e valore culturale, 
+            favorendo al contempo l’interazione tra produttori e fruitori di dati. L’infrastruttura costituisce un supporto operativo al Piano Nazionale di Digitalizzazione del Patrimonio Culturale (PND) e agisce in sinergia con l’HUB regionale ICC per generare nuove opportunità di sviluppo nel contesto culturale e creativo.
+        </p>
+    </section>
+    <section class="text-block">
+        <h2>Partenariato</h2>
+    </section>
+    <!-- LOGOS GRID -->
+    <section class="logos">
+        <img src="{{ url_for('static', filename='img/logo_lodovico.png') }}" alt="Lodovico">
+        <img src="{{ url_for('static', filename='img/logo_classense.png') }}" alt="Classense">
+        <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="Artifex">
+    </section>
+
+</main>
+
+{% endblock %}
