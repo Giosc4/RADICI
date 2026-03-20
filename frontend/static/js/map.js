@@ -290,6 +290,9 @@ function generateDominantIconExpression(types) {
 */
 function createTypeFilterUI(types, layer_id) {
     const container = document.getElementById('type-filter');
+    if (!container) {
+        return;
+    }
     container.innerHTML = ''; // Clear existing buttons
 
     let selectedType = 'all';
@@ -383,7 +386,10 @@ function setupURL(archive, id){
     * @param {string} imageId — The id of the select image
 */
 async function searchSimilarObjects(imageId) {
-    document.getElementById('similar-items').innerHTML = 'Loading...';
+    const similarItems = document.getElementById('similar-items');
+    if (similarItems) {
+        similarItems.innerHTML = 'Loading...';
+    }
     try {
         const response = await fetch(`${serverURL}/search`, {
             method: 'POST',
@@ -396,7 +402,10 @@ async function searchSimilarObjects(imageId) {
         displayResults(results); // your existing display function
     } catch (error) {
         console.error(error);
-        document.getElementById('similar-items').innerHTML = 'Nessun oggetto simile è stato trovato.';
+        const similarItems = document.getElementById('similar-items');
+        if (similarItems) {
+            similarItems.innerHTML = 'Nessun oggetto simile è stato trovato.';
+        }
     }
 }
 
@@ -464,20 +473,31 @@ function displayPopup(feature, map){
         if (popupEl) {
             const titleToggle = popupEl.querySelector('.popup-title');
             const shortText = popupEl.querySelector('.popup-short-text');
+            const expandButton = popupEl.querySelector('.popup-espandi-btn');
 
-            titleToggle.addEventListener('click', () => {
-                const isVisible = shortText.style.display === 'block';
-                shortText.style.display = isVisible ? 'none' : 'block';
-                titleToggle.classList.toggle('expanded', !isVisible);
-            });
+            if (titleToggle && shortText) {
+                titleToggle.addEventListener('click', () => {
+                    const isVisible = shortText.style.display === 'block';
+                    shortText.style.display = isVisible ? 'none' : 'block';
+                    titleToggle.classList.toggle('expanded', !isVisible);
+                });
+            }
 
-            popupEl.querySelector('.popup-espandi-btn').addEventListener('click', () => {
-                document.getElementById('sidebar_metamotor').style.right = '0';
-                document.querySelector('.mainContent').classList.add('blur-background');
-                console.log("Search similar objects");
-                console.log(id);
-                searchSimilarObjects(id);
-            });
+            if (expandButton) {
+                expandButton.addEventListener('click', () => {
+                    const sidebar = document.getElementById('sidebar_metamotor');
+                    const mainContent = document.querySelector('.mainContent');
+                    if (sidebar) {
+                        sidebar.style.right = '0';
+                    }
+                    if (mainContent) {
+                        mainContent.classList.add('blur-background');
+                    }
+                    console.log("Search similar objects");
+                    console.log(id);
+                    searchSimilarObjects(id);
+                });
+            }
         }
     }, 100);
 

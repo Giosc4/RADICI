@@ -19,8 +19,15 @@ async function loginUser() {
         const data = await res.json();
 
         if (res.ok) {
-            document.getElementById('login-section').classList.add('hidden');
-            document.getElementById('collection-section').classList.remove('hidden');
+            const loginSection = document.getElementById('login-section');
+            const collectionSection = document.getElementById('collection-section');
+
+            if (loginSection) {
+                loginSection.classList.add('hidden');
+            }
+            if (collectionSection) {
+                collectionSection.classList.remove('hidden');
+            }
             loadCollections();  // <-- load collections
             checkUserStatus(); // update header without reload
             alert(data.message);
@@ -36,6 +43,9 @@ async function loginUser() {
     const res = await fetch(`${serverURL}/user/collections`, { credentials: 'include' });
     const data = await res.json();
     const select = document.getElementById("collection-select");
+    if (!select) {
+        return;
+    }
     select.innerHTML = "";
     data.collections.forEach(c => {
         const opt = document.createElement("option");
@@ -48,6 +58,9 @@ async function loadCollections() {
     const res = await fetch(`${serverURL}/user/collections`, { credentials: 'include' });
     const data = await res.json();
     const select = document.getElementById("collection-select");
+    if (!select) {
+        return;
+    }
     select.innerHTML = "";
 
     data.collections.forEach(c => {
@@ -84,7 +97,11 @@ function createCollection() {
 }
 
 function saveObjectToCollection() {
-    const collection = document.getElementById("collection-select").value;
+    const collectionSelect = document.getElementById("collection-select");
+    if (!collectionSelect) {
+        return;
+    }
+    const collection = collectionSelect.value;
 
     fetch(`${serverURL}/user/collections/add`, {
         method: "POST",
@@ -99,9 +116,24 @@ function saveObjectToCollection() {
     .then(data => {
         if (data.success) {
             alert("Object saved!");
-            document.getElementById('login-section').classList.add('hidden');
-            document.getElementById('collection-section').classList.add('hidden');
-            document.getElementById('success-section').classList.remove('hidden');
+            const loginSection = document.getElementById('login-section');
+            const collectionSection = document.getElementById('collection-section');
+            const successSection = document.getElementById('success-section');
+
+            if (loginSection) {
+                loginSection.classList.add('hidden');
+            }
+            if (collectionSection) {
+                collectionSection.classList.add('hidden');
+            }
+            if (successSection) {
+                successSection.classList.remove('hidden');
+                successSection.innerHTML = `
+                    <h4>The object has been saved.</h4>
+                    <button class="modal-btn primary" onclick="closeFavoriteModal()">Continue browsing</button>
+                    <button class="modal-btn" onclick="window.location.href='/sperimentare'">Open collections</button>
+                `;
+            }
             //closeFavoriteModal();
             //loadFavorites();
         } else {

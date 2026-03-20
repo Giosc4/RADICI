@@ -8,7 +8,11 @@ const columns = [
 let colIndex = 0;
 
 function clearColumns() {
-    columns.forEach(c => c.innerHTML = "");
+    columns.forEach(c => {
+        if (c) {
+            c.innerHTML = "";
+        }
+    });
     colIndex = 0;
 }
 
@@ -26,12 +30,34 @@ function renderObject(obj) {
         </div>
     `;
 
-    columns[colIndex % columns.length].appendChild(item);
+    const column = columns[colIndex % columns.length];
+    if (!column) {
+        return;
+    }
+
+    column.appendChild(item);
     colIndex++;
 }
 
 function renderGrid(objects) {
     clearColumns();
+
+    if (!objects || objects.length === 0) {
+        const grid = document.getElementById("collection-grid");
+        if (grid) {
+            grid.insertAdjacentHTML(
+                "beforeend",
+                `
+                <div class="collection-empty-state">
+                    <p>This collection is currently empty.</p>
+                    <p>Open <a href="/esplorare?addToCollection=${encodeURIComponent(document.body.dataset.collection || "")}">Esplorare</a>, click the bookmark icon on an object, and save it into this collection.</p>
+                </div>
+                `
+            );
+        }
+        return;
+    }
+
     objects.forEach(renderObject);
 }
 
@@ -47,6 +73,13 @@ async function loadCollection(collectionName) {
 
         if (!data.success) {
             console.error(data.error);
+            const grid = document.getElementById("collection-grid");
+            if (grid) {
+                grid.insertAdjacentHTML(
+                    "beforeend",
+                    `<div class="collection-empty-state"><p>${data.error || "Unable to load collection."}</p></div>`
+                );
+            }
             return;
         }
 

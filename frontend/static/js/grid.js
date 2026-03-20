@@ -4,7 +4,10 @@ let spinnerStartTime = null;
 
 function showSpinner() {
     spinnerStartTime = Date.now();
-    document.getElementById('loading-spinner').classList.remove('hidden');
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) {
+        spinner.classList.remove('hidden');
+    }
 }
 
 function hideSpinner() {
@@ -16,17 +19,26 @@ function hideSpinner() {
 
     if (remaining > 0) {
         setTimeout(() => {
-            document.getElementById('loading-spinner').classList.add('hidden');
+            const spinner = document.getElementById('loading-spinner');
+            if (spinner) {
+                spinner.classList.add('hidden');
+            }
         }, remaining);
     } else {
-        document.getElementById('loading-spinner').classList.add('hidden');
+        const spinner = document.getElementById('loading-spinner');
+        if (spinner) {
+            spinner.classList.add('hidden');
+        }
     }
 }
 
 
 function clearFeatureColumns() {
   ['col-1', 'col-2', 'col-3', 'col-4'].forEach(id => {
-      document.getElementById(id).innerHTML = '';
+      const column = document.getElementById(id);
+      if (column) {
+          column.innerHTML = '';
+      }
       currentOffset = 0;
   });
 }
@@ -69,6 +81,9 @@ function displayFeatures(features) {
     features.forEach((feature, index) => {
       const colIndex = index % columns.length;
       const col = columns[colIndex];
+      if (!col) {
+          return;
+      }
       const img_path = feature.properties.img_path;
       const parts = img_path.split("/");
       const img_file = parts[parts.length - 1];
@@ -105,8 +120,14 @@ function displayFeatures(features) {
 
 //display sidebar on image click
 function triggerActions(id) {
-    document.getElementById('sidebar_metamotor').style.right = '0';
-    document.querySelector('.mainContent').classList.add('blur-background');
+    const sidebar = document.getElementById('sidebar_metamotor');
+    const mainContent = document.querySelector('.mainContent');
+    if (sidebar) {
+        sidebar.style.right = '0';
+    }
+    if (mainContent) {
+        mainContent.classList.add('blur-background');
+    }
     res = getObjectById(id);
     //displayResults(res);
     
@@ -135,6 +156,9 @@ function loadMoreFeatures() {
     nextFeatures.forEach((feature, index) => {
         const colIndex = (currentOffset + index) % columns.length;
         const col = columns[colIndex];
+        if (!col) {
+            return;
+        }
         const img_path = feature.properties.img_path;
         const img_file = img_path.split("/").pop();
 

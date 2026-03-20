@@ -22,22 +22,34 @@ async function openFavoriteModal(featureId, event) {
     const collectionSection = document.getElementById('collection-section');
 
     if (loggedIn) {
-        loginSection.classList.add('hidden');
-        collectionSection.classList.remove('hidden');
+        if (loginSection) {
+            loginSection.classList.add('hidden');
+        }
+        if (collectionSection) {
+            collectionSection.classList.remove('hidden');
+        }
         loadCollections(); // load user's collections
     } else {
-        loginSection.classList.remove('hidden');
-        collectionSection.classList.add('hidden');
+        if (loginSection) {
+            loginSection.classList.remove('hidden');
+        }
+        if (collectionSection) {
+            collectionSection.classList.add('hidden');
+        }
     }
 
-    favoriteModal.classList.remove('hidden');
+    if (favoriteModal) {
+        favoriteModal.classList.remove('hidden');
+    }
 }
 
 
 
 // Function to close modal
 function closeFavoriteModal() {
-    favoriteModal.classList.add('hidden');
+    if (favoriteModal) {
+        favoriteModal.classList.add('hidden');
+    }
 }
 
 // Attach close button
@@ -46,6 +58,8 @@ if (closeBtn) {
 }
 
 // Close on outside click
-favoriteModal.addEventListener('click', (e) => {
-    if (e.target === favoriteModal) closeFavoriteModal();
-});
+if (favoriteModal) {
+    favoriteModal.addEventListener('click', (e) => {
+        if (e.target === favoriteModal) closeFavoriteModal();
+    });
+}

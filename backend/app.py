@@ -13,6 +13,7 @@ import faiss
 import nltk
 import hashlib
 import datetime
+import unicodedata
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from collections import defaultdict
@@ -217,6 +218,103 @@ def extract_keywords(text):
 
     keywords = [t for t in tokens if t not in stop_words and len(t) > 2]
     return keywords
+
+
+
+def normalize_search_text(value):
+    """Normalize free-text input for accent-insensitive substring matching."""
+    if not value:
+        return ""
+
+    normalized = unicodedata.normalize("NFKD", str(value))
+    normalized = "".join(ch for ch in normalized if not unicodedata.combining(ch))
+    normalized = re.sub(r"\s+", " ", normalized.lower()).strip()
+    return normalized
+
+
+def serialize_search_result(obj, obj_id=None):
+    """Return a frontend-friendly representation of a Redis object."""
+    resolved_id = obj.get("id", obj_id or "")
+    return {
+        "id": resolved_id,
+        "title": obj.get("title", ""),
+        "description": obj.get("model_base", ""),
+        "author": obj.get("author", ""),
+        "origin": obj.get("origin", ""),
+        "model_base": obj.get("model_base", ""),
+        "singer": obj.get("singer", ""),
+        "img_path": obj.get("img_path", "default.jpeg"),
+        "fondo": obj.get("fondo", ""),
+        "date": obj.get("date", ""),
+        "image": obj.get("image", ""),
+        "coordinates": obj.get("coordinates", "")
+    }
+
+
+def get_direct_search_results(query, limit=10):
+    """
+    Prioritize direct lexical matches so exact or partial title searches surface
+    the expected work before semantic keyword expansion kicks in.
+    """
+    normalized_query = normalize_search_text(query)
+    if not normalized_query:
+        return []
+
+    query_tokens = [token for token in normalized_query.split(" ") if token]
+    ranked = []
+
+    for obj in redis_objects:
+        obj_id = str(obj.get("id", "")).strip()
+        title = obj.get("title", "")
+        author = obj.get("author", "")
+        archive = obj.get("archive", "")
+        type_ = obj.get("type", "")
+
+        normalized_id = normalize_search_text(obj_id)
+        normalized_title = normalize_search_text(title)
+        normalized_author = normalize_search_text(author)
+        normalized_generic = normalize_search_text(" ".join([obj_id, title, author, archive, type_]))
+
+        score = 0
+
+        if normalized_id == normalized_query:
+            score += 1000
+        elif normalized_id.startswith(normalized_query):
+            score += 700
+        elif normalized_query in normalized_id:
+            score += 500
+
+        if normalized_title == normalized_query:
+            score += 900
+        elif normalized_title.startswith(normalized_query):
+            score += 650
+        elif normalized_query in normalized_title:
+            score += 450
+
+        if normalized_author and normalized_query in normalized_author:
+            score += 120
+
+        token_hits = sum(1 for token in query_tokens if token in normalized_generic)
+        title_token_hits = sum(1 for token in query_tokens if token in normalized_title)
+
+        if title_token_hits == len(query_tokens) and query_tokens:
+            score += 240
+
+        score += title_token_hits * 40
+        score += token_hits * 15
+
+        if score <= 0:
+            continue
+
+        ranked.append((
+            score,
+            len(normalized_title) if normalized_title else 10**9,
+            normalized_title,
+            serialize_search_result(obj, obj_id=obj_id)
+        ))
+
+    ranked.sort(key=lambda item: (-item[0], item[1], item[2]))
+    return [item[3] for item in ranked[:limit]]
 
 # ---------------------------------------------------------
 # Load FAISS index from Redis hashes
@@ -1020,50 +1118,43 @@ def search():
 # ---------------------------------------------------------
 @app.route("/search_keywords", methods=["GET"])
 def search_keywords():
-    model = get_model()
     query = request.args.get("q", "").strip().lower()
-    if not query or len(keyword_list) == 0 or model is None:
+    if not query:
         return jsonify({"results": []})
 
-    # Embed the query text
-    query_emb = model.encode([query]).astype("float32")
+    direct_results = get_direct_search_results(query, limit=10)
+    direct_ids = {result["id"] for result in direct_results}
 
-    # Limit number of keyword matches
-    k = min(10, len(keyword_list))
-    D, I = keyword_faiss.search(query_emb, k)
+    model = get_model()
+    matched_keywords = []
+    semantic_results = []
 
-    # Get matched keywords
-    matched_keywords = [keyword_list[i] for i in I[0]]
+    if len(keyword_list) > 0 and model is not None:
+        # Keep the existing semantic keyword search as a secondary signal.
+        query_emb = model.encode([query]).astype("float32")
+        k = min(10, len(keyword_list))
+        D, I = keyword_faiss.search(query_emb, k)
+        matched_keywords = [keyword_list[i] for i in I[0]]
 
-    # Collect unique object IDs for matched keywords
-    matched_ids = set()
-    for kw in matched_keywords:
-        matched_ids.update(keyword_map.get(kw, []))
+        matched_ids = set()
+        for kw in matched_keywords:
+            matched_ids.update(keyword_map.get(kw, []))
 
-    # Fetch the objects from Redis
-    results = []
-    for obj_id in matched_ids:
-        obj = r.hgetall(f"{obj_id}")
-        if obj:
-            # Make sure each object includes an 'id' field for the frontend
-            results.append({
-                "id": obj.get("id", obj_id),
-                "title": obj.get("title", ""),
-                "description": obj.get("model_base", ""),
-                "author": obj.get("author", ""),
-                "origin": obj.get("origin", ""),
-                "model_base": obj.get("model_base", ""),
-                "singer": obj.get("singer", ""),
-                "img_path": obj.get("img_path", "default.jpeg"),
-                "fondo": obj.get("fondo", ""),
-                "date": obj.get("date", ""),
-                "image": obj.get("image", ""),
-                "coordinates": obj.get("coordinates", "")
-            })
+        for obj_id in matched_ids:
+            obj = r.hgetall(f"{obj_id}")
+            if not obj:
+                continue
+
+            serialized = serialize_search_result(obj, obj_id=obj_id)
+            if serialized["id"] in direct_ids:
+                continue
+            semantic_results.append(serialized)
+
+    results = (direct_results + semantic_results)[:10]
 
     return jsonify({
         "matched_keywords": matched_keywords,
-        "results": results[:10]  # limit to 10 results
+        "results": results
     })
 
 # ---------------------------------------------------------
@@ -1207,12 +1298,11 @@ def add_to_collection():
 def get_collection(collection_name):
     username = session["user"]
 
-    key = f"user:{username}:collection:{collection_name}"
-
-    if not r_users.exists(key):
+    if not r_users.sismember(f"user:{username}:collections", collection_name):
         return jsonify({"success": False, "error": "Collection not found"}), 404
 
-    object_ids = r_users.smembers(key)
+    key = f"user:{username}:collection:{collection_name}"
+    object_ids = r_users.smembers(key) or set()
     objects = []
 
     for obj_id in object_ids:
